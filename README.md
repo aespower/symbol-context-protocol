@@ -1,162 +1,167 @@
 # Symbol Context Protocol (SCP)
 
-## Open Source Protocol for AI Context Optimization
+## Protocolo Open Source de Representación de Contexto para Sistemas de IA
 
-### Author
-Johanny Baez
-
-### Version
-v0.1 Concept Draft
+**Autor:** Johanny Baez
+**Estado:** Borrador v0.2
 
 ---
 
-## Vision
+## Visión
 
-Symbol Context Protocol (SCP) is an open-source proposal designed to optimize how AI systems represent objectives, memory, tasks, agents, execution states, and knowledge relationships.
+Los sistemas multiagente consumen grandes cantidades de contexto describiendo repetidamente objetivos, tareas, estados y relaciones en lenguaje natural.
 
-Instead of relying exclusively on verbose natural language, SCP introduces a compact symbolic layer that can be interpreted by both humans and large language models.
+SCP propone una capa intermedia con **dos representaciones equivalentes**:
 
-The goal is not to replace human language.
+- **SCP-C (capa canónica):** notación ASCII densa, optimizada para tokens. Es lo que viaja entre agentes y se guarda en memoria.
+- **SCP-V (capa visual):** renderizado con emojis, optimizado para humanos. Es lo que se muestra en dashboards, logs y documentación.
 
-The goal is to create an efficient intermediate representation for:
+Un parser traduce entre ambas capas y hacia JSON/grafos sin pérdida.
 
-- AI Operating Systems (AIOS)
-- Multi-agent systems
-- Knowledge Graphs
-- Persistent memory
-- Workflow automation
-- Context compression
+```txt
+SCP-C (máquina):   G > T:script > A:writer > X = OK
+SCP-V (humano):    🎯 ↓ 📋(script) ↓ 🤖(writer) ↓ ⚡ → ✓
+JSON (sistemas):   {"goal":{"task":"script","agent":"writer","exec":"ok"}}
+```
+
+La meta no es reemplazar el lenguaje humano. Es separar la eficiencia (capa C) de la legibilidad (capa V) para que ninguna comprometa a la otra.
 
 ---
 
-## Example
+## Problema
 
-Traditional:
+- Alto consumo de tokens en sistemas multiagente.
+- Contextos extensos y repetitivos.
+- Reconstrucción constante del estado operativo.
+- Dificultad para compartir conocimiento entre agentes.
 
-"The video agent should execute the task of creating content focused on growth and monetization."
+Ejemplo tradicional (≈18 tokens):
 
-SCP:
+```txt
+El agente de video debe ejecutar la tarea de crear contenido orientado al crecimiento y la monetización.
+```
 
+SCP-C (≈10 tokens):
+
+```txt
+A:video > T:content = GROW+REV
+```
+
+SCP-V (solo para humanos):
+
+```txt
 🤖🎬 ⚡ 📋 → 📈 + 💰
+```
+
+> **Nota honesta sobre tokens:** los emojis y símbolos Unicode raros suelen costar 2-4 tokens cada uno en los tokenizadores actuales, mientras que los códigos ASCII cuestan 1. Por eso la capa canónica es ASCII y los emojis son únicamente una capa de renderizado. Esta corrección es el cambio principal respecto a v0.1.
 
 ---
 
-## Core Principles
+## Principios Fundamentales
 
-### 1. Semantic Compression
-
-Reduce redundant language while preserving meaning.
-
-### 2. Human Readability
-
-Humans should be able to interpret SCP without specialized tools.
-
-### 3. LLM Compatibility
-
-Works with existing language models.
-
-### 4. Hierarchical Structure
-
-🎯 Goal
-↓
-🧠 Memory
-↓
-📋 Task
-↓
-🤖 Agent
-↓
-⚡ Execute
-↓
-✓ Result
-
-### 5. Graph-Oriented Design
-
-Symbols represent nodes.
-
-Relationships represent edges.
+1. **Compresión real, medida.** Toda afirmación de ahorro de tokens debe validarse con benchmarks de tokenizadores reales (tiktoken o equivalente), comparando contra lenguaje natural y JSON.
+2. **Legibilidad humana sin costo.** La capa visual existe para humanos; nunca viaja por el contexto del modelo.
+3. **Compatibilidad con LLMs actuales.** El diccionario SCP-C cabe en un bloque corto de system prompt; no requiere entrenamiento adicional.
+4. **Estructura jerárquica.** Goal → Memory → Task → Agent → Execute → Result.
+5. **Orientación a grafos.** Los símbolos son nodos; los operadores son aristas. Mapeo directo a triples (sujeto, relación, objeto).
 
 ---
 
-## Initial Symbol Dictionary
+## Diccionario v0.2
 
-| Symbol | Meaning |
-|----------|----------|
-| 🎯 | Goal |
-| 🧠 | Memory |
-| 📋 | Task |
-| 🤖 | Agent |
-| ⚡ | Execute |
-| ✓ | Complete |
-| ✗ | Failed |
-| 🔄 | Retry |
-| 📈 | Growth |
-| 💰 | Revenue |
-| 🎬 | Video |
-
----
-
-## Example Workflows
-
-### Business Goal
-
-🎯
-↓
-📈 + 💰
-
-### Standard Workflow
-
-🎯
-↓
-📋
-↓
-🤖
-↓
-⚡
-↓
-✓
-
-### Video Production
-
-🎯
-↓
-🎬
-↓
-🤖
-↓
-⚡
-↓
-✓
+| Código (SCP-C) | Render (SCP-V) | Significado | Categoría |
+|---|---|---|---|
+| `G` | 🎯 | Goal — objetivo | Planificación |
+| `M` | 🧠 | Memory — contexto almacenado | Memoria |
+| `T` | 📋 | Task — unidad de trabajo | Ejecución |
+| `A` | 🤖 | Agent — agente autónomo | Agentes |
+| `X` | ⚡ | Execute — paso de ejecución | Ejecución |
+| `OK` | ✓ | Complete — éxito | Estado |
+| `FAIL` | ✗ | Failed — fallo | Estado |
+| `RTY` | 🔄 | Retry — reintento | Estado |
+| `GROW` | 📈 | Growth — crecimiento | Negocio |
+| `REV` | 💰 | Revenue — ingresos | Negocio |
+| `VID` | 🎬 | Video — producción audiovisual | Producción |
 
 ---
 
-## SCP + AIOS
+## Gramática v0.2
 
-Goal Engine
-↓
-Knowledge Graph
-↓
-SCP
-↓
-Agents
-↓
-Execution
+| Operador | Nombre | Significado |
+|---|---|---|
+| `>` | Secuencia | Un elemento conduce/asigna al siguiente (render: ↓) |
+| `=` | Resultado | La expresión produce este resultado (render: →) |
+| `+` | Combinación | Elementos combinados |
+| `:` | Parámetro | Asigna nombre o valor a un símbolo |
+| `[ ]` | Grupo | Agrupa expresiones |
+| `( )` | Metadata | Contexto adicional |
+
+**Cambio respecto a v0.1:** los operadores ↓ ("conduce a") y → ("produce") se solapaban. En v0.2: `>` encadena pasos del flujo; `=` marca exclusivamente el resultado final de una ejecución.
+
+### Patrones
+
+```txt
+Flujo estándar:    G > T > A > X = OK
+                   🎯 ↓ 📋 ↓ 🤖 ↓ ⚡ → ✓
+
+Fallo y reintento: G > T > A > X = FAIL > RTY
+                   🎯 ↓ 📋 ↓ 🤖 ↓ ⚡ → ✗ → 🔄
+
+Objetivo negocio:  G = [GROW+REV]
+                   🎯 → [📈 + 💰]
+
+Con parámetros:    T:script(priority:high) > A:writer > X = OK
+                   📋(script, alta prioridad) ↓ 🤖(writer) ↓ ⚡ → ✓
+
+Memoria:           M:user_pref = VID+retention
+                   🧠(preferencia): 🎬 + retención
+```
 
 ---
 
-## Future Roadmap
+## Benchmark (preliminar, bytes UTF-8)
 
-- 100+ standardized symbols
-- Formal grammar specification
-- Universal parser
-- Python SDK
-- JavaScript SDK
-- LangGraph integration
-- CrewAI integration
-- AutoGen integration
-- AIOS integration
+| Representación | Ejemplo | Bytes |
+|---|---|---|
+| Lenguaje natural | `goal leads to task, agent executes, done` | 41 |
+| Emoji (v0.1) | `🎯 ↓ 📋 ↓ 🤖 ↓ ⚡ → ✓` | 38 |
+| SCP-C (v0.2) | `G>T>A>X=OK` | 10 |
+
+Pendiente: benchmark con tokenizadores reales sobre 50+ expresiones (ver roadmap v0.3).
 
 ---
 
-## Mission
+## Integración con AIOS
 
-Build an open protocol for representing knowledge, goals, memory, execution, and agent coordination in a compact, visual, and efficient format for the next generation of AI systems.
+```txt
+Goal Engine → Knowledge Graph → SCP-C → Agents → Execution
+                                  ↕
+                               SCP-V (dashboards, logs, humanos)
+```
+
+SCP puede funcionar como capa de memoria, comunicación interagente, representación de conocimiento y seguimiento de ejecución.
+
+---
+
+## Roadmap
+
+- **v0.2 — Dos capas (este documento):** diccionario ASCII+render, gramática desambiguada.
+- **v0.3 — Parser prototipo + benchmark:** Python, SCP-C ↔ SCP-V ↔ JSON, validación de sintaxis, benchmark de tokens publicado. *(Adelantado: el parser es lo que convierte el concepto en herramienta.)*
+- **v0.4 — Diccionario extendido:** 100+ códigos por categoría, convenciones de nombres.
+- **v0.5 — Gramática formal:** especificación EBNF, anidamiento, patrones reutilizables.
+- **v0.6 — Mapeo a Knowledge Graphs:** nodos, aristas, metadata, ejemplos con bases de grafos.
+- **v0.7 — SDKs:** Python y JavaScript (con renderer visual).
+- **v0.8 — Integraciones:** LangGraph, CrewAI, AutoGen, AIOS.
+- **v1.0 — Estándar estable:** especificación congelada, implementación de referencia.
+
+---
+
+## Trabajo relacionado
+
+SCP se diferencia de: compresión de prompts (LLMLingua) — SCP es una notación, no un compresor estadístico; triples RDF — SCP prioriza flujos de ejecución y legibilidad; y formatos estructurados (JSON/YAML) — SCP-C es más denso y SCP-V más legible. El roadmap incluye comparativas formales.
+
+---
+
+## Misión
+
+Crear un protocolo abierto para representar conocimiento, objetivos, memoria y ejecución de forma compacta para las máquinas y visual para las personas — sin que una meta comprometa la otra.
