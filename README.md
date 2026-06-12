@@ -130,7 +130,9 @@ Primer benchmark v0.3 sobre 200 entradas de workflow (cl100k y o200k):
 | TOON | 2.307 | 53% |
 | **SCP-C + leyenda** | **2.508** | **49%** |
 
-Break-even: SCP supera a la prosa desde ~7 entradas y al JSON desde ~9. En corpus tabular uniforme TOON gana por ~4 puntos (es su nicho declarado); el escenario heterogéneo, hipótesis central de SCP, aún no está medido. Datos y metodología: [benchmarks/results.md](benchmarks/results.md).
+Break-even: SCP supera a la prosa desde ~7 entradas y al JSON desde ~9.
+
+Segundo benchmark (estado heterogéneo: workflows + metadata + memoria + reglas, orden preservado): **SCP es el único formato que ahorra tokens (26%) preservando el orden de las entradas** — TOON preservando orden cuesta 2,1x más que SCP y el JSON compacto sale peor que la prosa. En datos tabulares uniformes sin orden, TOON gana: los formatos son complementarios. Datos completos: [benchmarks/results.md](benchmarks/results.md).
 
 ---
 

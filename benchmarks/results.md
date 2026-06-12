@@ -43,3 +43,32 @@ SCP's hypothesized advantage is **heterogeneous state**: variable-length chains,
 pip install tiktoken
 python benchmarks/run.py --vocab path/to/o200k_base.tiktoken --name o200k_base --csv curve.csv
 ```
+
+---
+
+# Heterogeneous Benchmark (second run, same date)
+
+**Corpus:** 200 mixed entries — 80 plain workflows, 40 workflows with metadata (priority, deadline), 30 memory entries, 30 conditional rules (SCP-R), 20 group goals — shuffled to simulate a real agent log. Script: `run_het.py` (seed 42). Legend (with SCP-R extension): 94 tokens, counted against SCP.
+
+## Results (o200k_base; cl100k within ±2%)
+
+| Format | Tokens | vs prose | Preserves entry order? |
+|---|---|---|---|
+| English prose | 3,638 | — | ✅ |
+| Compact JSON | 5,065 | **−39% (worse)** | ✅ |
+| TOON, grouped by type | 2,417 | 34% | ❌ destroyed |
+| TOON, order-preserving (nested) | 5,809 | **−60% (worse)** | ✅ |
+| **SCP-C + legend** | **2,710** | **26%** | ✅ |
+
+## Findings
+
+1. **SCP is the only format that both saves tokens and preserves order on heterogeneous state.** Order-preserving TOON costs 2.1x more than SCP; compact JSON is worse than prose here.
+2. **TOON grouped still wins raw token count (+8 pts)** — but at two real costs: global entry order is destroyed (fatal for execution logs and event streams), and variable-arity values must be smuggled into cells as ad-hoc `|`-strings, which is no longer self-describing TOON.
+3. **Niche definition, now data-backed:** use TOON for bulk uniform data dumps where order is irrelevant; use SCP-C for ordered, heterogeneous, append-friendly agent state (logs, memory, rules, mixed workflows). The formats are complementary.
+4. SCP's savings dropped vs the uniform corpus (26% vs 49%) mainly because metadata syntax `(priority:high,deadline:d12)` is token-expensive — an optimization target for v0.4.
+
+## Reproduce
+
+```bash
+python benchmarks/run_het.py --vocab path/to/o200k_base.tiktoken --name o200k_base
+```
