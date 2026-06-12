@@ -119,15 +119,18 @@ Memoria:           M:user_pref = VID+retention
 
 ---
 
-## Benchmark (preliminar, bytes UTF-8)
+## Benchmark (medido, tokenizadores reales)
 
-| Representación | Ejemplo | Bytes |
+Primer benchmark v0.3 sobre 200 entradas de workflow (cl100k y o200k):
+
+| Formato | Tokens | Ahorro vs prosa |
 |---|---|---|
-| Lenguaje natural | `goal leads to task, agent executes, done` | 41 |
-| Emoji (v0.1) | `🎯 ↓ 📋 ↓ 🤖 ↓ ⚡ → ✓` | 38 |
-| SCP-C (v0.2) | `G>T>A>X=OK` | 10 |
+| Prosa en inglés | 4.932 | — |
+| JSON compacto | 4.326 | 12% |
+| TOON | 2.307 | 53% |
+| **SCP-C + leyenda** | **2.508** | **49%** |
 
-Pendiente: benchmark con tokenizadores reales sobre 50+ expresiones (ver roadmap v0.3).
+Break-even: SCP supera a la prosa desde ~7 entradas y al JSON desde ~9. En corpus tabular uniforme TOON gana por ~4 puntos (es su nicho declarado); el escenario heterogéneo, hipótesis central de SCP, aún no está medido. Datos y metodología: [benchmarks/results.md](benchmarks/results.md).
 
 ---
 
