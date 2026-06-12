@@ -165,3 +165,9 @@ SCP se diferencia de: compresión de prompts (LLMLingua) — SCP es una notació
 ## Misión
 
 Crear un protocolo abierto para representar conocimiento, objetivos, memoria y ejecución de forma compacta para las máquinas y visual para las personas — sin que una meta comprometa la otra.
+
+---
+
+## Skill para Claude
+
+El directorio [`skills/scp-context-optimizer`](skills/scp-context-optimizer) contiene una skill instalable para Claude (Cowork / Claude Code) que aplica SCP automáticamente: comprime contexto operativo a SCP-C, lo renderiza como SCP-V e incluye el parser de referencia (`scripts/scp.py`, SCP-C ↔ JSON ↔ SCP-V).
