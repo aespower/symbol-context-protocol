@@ -158,6 +158,8 @@ SCP puede funcionar como capa de memoria, comunicación interagente, representac
 
 ## Trabajo relacionado
 
+Comparativa completa con LLMLingua, TOON, MetaGlyph y otras estrategias: [docs/related-work.md](docs/related-work.md).
+
 SCP se diferencia de: compresión de prompts (LLMLingua) — SCP es una notación, no un compresor estadístico; triples RDF — SCP prioriza flujos de ejecución y legibilidad; y formatos estructurados (JSON/YAML) — SCP-C es más denso y SCP-V más legible. El roadmap incluye comparativas formales.
 
 ---
